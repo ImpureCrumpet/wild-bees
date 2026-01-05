@@ -31,7 +31,7 @@ public class LivingEntityDamageMixin
 			return;
 
 		// Only apply if non-lethal stings are enabled
-		if (!(self.getEntityWorld() instanceof ServerWorld serverWorld)) {
+		if (!(self.getWorld() instanceof ServerWorld serverWorld)) {
 			return;
 		}
 
