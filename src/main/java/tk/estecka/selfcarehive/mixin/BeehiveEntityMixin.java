@@ -182,6 +182,18 @@ implements IBeeColonyTracker
 			BlockState hiveState = stateRef.get();
 			BeeEntity baby = null;
 
+			// Check if this is a bee nest release (for extended anger duration)
+			boolean isNest = tk.estecka.selfcarehive.WildBeeUtil.isBeeNest(hiveState);
+			if (isNest && world instanceof ServerWorld serverWorld) {
+				net.minecraft.world.GameRules rules = serverWorld.getServer().getGameRules();
+				net.minecraft.util.math.random.Random random = serverWorld.getRandom();
+				int angerMin = rules.getInt(SelfCareHive.NEST_ANGER_MIN);
+				int angerMax = rules.getInt(SelfCareHive.NEST_ANGER_MAX);
+				int angerTime = angerMin + random.nextInt(angerMax - angerMin + 1);
+				bee.setAngerTime(angerTime);
+				((tk.estecka.selfcarehive.mixin.BeeEntityMixin)(Object)bee).selfcarehive$markFromNest();
+			}
+
 			var result = BeehiveUtil.TryCreateBaby(bee, colony, (ServerWorld)world, hiveState, pos);
 			baby = result.getLeft();
 			hiveState = result.getRight();

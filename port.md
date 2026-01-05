@@ -1,28 +1,43 @@
-# Minecraft Code Breaking Changes
-## 1.19.4
-Current master
+# Version Support
 
-## 1.20.5
-### No Workaround:
-- `BlockEntity::readNbt` and `writeNbt` now requires a Registry Wrapper Lookup parameter.
-- `BehiveBlockEntity` now has a new `BeeData` reccord that tracks ticks-in-hive and nectar, across most functions.
-- `BehiveBlockEntity::tryEnterHive` and `addBee` no longer take parameters carried by `BeeData`.
-- `BehiveBlockEntity::onReleaseBee` no longer directly calls `EntityType::loadEntityWithPassengers`.
+## This Fork
 
-## 1.21.2
-### Worked around:
-- `World.getGamerules()` was moved to `ServerWorld`. Use `MinecraftServer::getGamerules` instead.
+**Supported Minecraft Versions:** `1.21.9+` (Fabric)
 
-## 1.21.4
-### Worked around:
-- `tryEnterHive` now takes a `BeeEntity` instead of an `Entity`. Target both versions and use `@Coerce`
+This fork targets Minecraft 1.21.9 and later within the 1.21.x series. Earlier versions have breaking API changes that would require significant rework.
 
-## 1.21.5
-- `NbtCompound::contains` no longer check the element type.
-- `NbtCompound` various get methods are now wrapped in optionals, or require a fallback as parameter.
+## Breaking Changes Reference
 
-## 1.21.6
-- Serialization no longer directly manipulated NBT and must be backed by a codec.
+The following documents Minecraft API changes that affected this mod's development:
 
-## 1.21.9
-- `Entity::getpos` and `Entity::getWorld` were replaced with `HeldItemContext::getEntityPos` and `HeldItemContext::getEntityWorld`.
+### 1.19.4
+Original Self-Care Hive baseline.
+
+### 1.20.5
+- `BlockEntity::readNbt` and `writeNbt` now require a Registry Wrapper Lookup parameter.
+- `BeehiveBlockEntity` now uses a `BeeData` record that tracks ticks-in-hive and nectar.
+- `BeehiveBlockEntity::tryEnterHive` and `addBee` no longer take parameters carried by `BeeData`.
+- `BeehiveBlockEntity::onReleaseBee` no longer directly calls `EntityType::loadEntityWithPassengers`.
+
+### 1.21.2
+- `World.getGameRules()` was moved to `ServerWorld`. Use `MinecraftServer::getGameRules` instead.
+
+### 1.21.4
+- `tryEnterHive` now takes a `BeeEntity` instead of an `Entity`.
+
+### 1.21.5
+- `NbtCompound::contains` no longer checks the element type.
+- `NbtCompound` get methods are now wrapped in optionals, or require a fallback parameter.
+
+### 1.21.6
+- Serialization no longer directly manipulates NBT and must be backed by a codec.
+
+### 1.21.9
+- `Entity::getPos` and `Entity::getWorld` were replaced with `Entity::getEntityPos` and `Entity::getEntityWorld`.
+
+## Original Mod Version Support
+
+The [original Self-Care Hive mod](https://modrinth.com/mod/selfcare-hive) by Estecka supports:
+- Minecraft 1.21–1.21.10
+- Minecraft 1.20.x
+- Minecraft 1.19.4

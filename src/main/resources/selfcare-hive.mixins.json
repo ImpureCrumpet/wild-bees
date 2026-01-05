@@ -3,7 +3,10 @@
 	"package": "tk.estecka.selfcarehive.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"BeehiveEntityMixin"
+		"BeehiveEntityMixin",
+		"BeehiveBlockMixin",
+		"BeeEntityMixin",
+		"LivingEntityDamageMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
