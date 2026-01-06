@@ -41,6 +41,14 @@ implements ModInitializer
 	static public final Key<DoubleRule> MIN_STING_HEALTH = GameRuleRegistry.register("selfcarehive.wildbees.min_sting_health", CATEGORY, createDoubleRule(4.0, 0.0)); // Minimum health for wild bees after stinging (prevents death)
 	static public final Key<BooleanRule> NON_LETHAL_STINGS = GameRuleRegistry.register("selfcarehive.wildbees.non_lethal_stings", CATEGORY, createBooleanRule(true)); // Prevents wild bees from dying when stinging
 
+	// Bee Dimensions Mechanics (hardcoded defaults for client/server consistency)
+	static public final float BEE_SIZE_DEFAULT = 0.65f; // Hardcoded for client-side rendering
+	static public final int BEEHIVE_CAPACITY_DEFAULT = 21; // Hardcoded for client-side rendering
+	
+	static public final Key<DoubleRule> BEE_SIZE_MODIFIER = GameRuleRegistry.register("selfcarehive.beedimensions.modifier", CATEGORY, createDoubleRule(0.65, 0.01, 5.0)); // Bee size multiplier (0.65 = 65% of vanilla)
+	static public final Key<IntRule> BEEHIVE_CAPACITY = GameRuleRegistry.register("selfcarehive.beedimensions.hive_capacity", CATEGORY, createIntRule(21, 1, 50)); // Maximum bees per hive (vanilla = 3)
+	static public final Key<BooleanRule> PREVENT_SUFFOCATION = GameRuleRegistry.register("selfcarehive.beedimensions.prevent_suffocation", CATEGORY, createBooleanRule(true)); // Prevent small bees from suffocation damage (fixes disappearing bug)
+
 	@Override
 	public void onInitialize() {
 		// static init

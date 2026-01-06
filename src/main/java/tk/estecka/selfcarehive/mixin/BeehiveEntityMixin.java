@@ -11,7 +11,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -87,7 +90,8 @@ implements IBeeColonyTracker
 		this.elapsedTicks = 0;
 
 		// Removes bees that were pushed out by new inhabitants.
-		final int maxKnownBees = Math.max(0, MAX_BEE_COUNT - this.getBeeCount());
+		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		final int maxKnownBees = Math.max(0, maxCapacity - this.getBeeCount());
 		if (knownBees.size() > maxKnownBees) {
 			// Sorts from newest (smallest) to oldest (largest)
 			final var sortedEntries = new ArrayList<>(knownBees.entrySet());
@@ -116,7 +120,8 @@ implements IBeeColonyTracker
 
 	public boolean selfcarehive$isColonyFull(){
 		this.GarbageCollectBees();
-		return (this.getBeeCount() + this.knownBees.size()) >= MAX_BEE_COUNT;
+		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		return (this.getBeeCount() + this.knownBees.size()) >= maxCapacity;
 	}
 
 	public void selfcarehive$RememberBee(UUID uuid){
@@ -137,6 +142,22 @@ implements IBeeColonyTracker
 	@Inject( method="readData", at=@At("TAIL") )
 	private void ReadCustomData(ReadView view, CallbackInfo ci){
 		view.read(KNOWNBEES_KEY, CODEC).ifPresent(this.knownBees::putAll);
+	}
+
+
+	/******************************************************************************/
+	/* # Bee Dimensions Integration                                               */
+	/******************************************************************************/
+
+	@Inject(method = "isFull()Z", at = @At("HEAD"), cancellable = true)
+	private void modifyIsFull(CallbackInfoReturnable<Boolean> cir) {
+		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		cir.setReturnValue(this.getBeeCount() >= maxCapacity);
+	}
+
+	@ModifyConstant(method = "addOccupant", constant = @Constant(intValue = 3))
+	private int modifyMaxBeeCount(int original) {
+		return this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
 	}
 
 
