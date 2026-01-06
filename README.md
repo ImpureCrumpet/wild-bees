@@ -2,7 +2,19 @@
 
 > **This is a fork of [Self-Care Hive](https://modrinth.com/mod/selfcare-hive) by Estecka.**
 > 
-> Wild Bees adds defensive mechanics to bee nests while preserving all original Self-Care Hive functionality.
+> Wild Bees adds defensive mechanics to bee nests and smaller bee dimensions while preserving all original Self-Care Hive functionality.
+
+---
+
+## Supported Versions
+
+| Minecraft | Branch | Status |
+|-----------|--------|--------|
+| 1.21.9–1.21.10 | `1.21.10` | ✅ Active Development |
+| 1.21.6–1.21.8 | `1.21.8` | ✅ Supported |
+| 1.21.2–1.21.5 | `1.21.5` | ✅ Supported |
+
+All versions include the full feature set: wild bee mechanics, bee dimensions, healing, and breeding.
 
 ---
 
@@ -33,7 +45,7 @@ To prevent wild bees from dying during swarm encounters:
 
 Player-crafted **beehives** retain vanilla behavior. Smoke still fully protects you, and bees use standard anger duration. All Self-Care healing and breeding mechanics work normally.
 
-### Configuration (Game Rules)
+### Wild Bee Configuration (Game Rules)
 
 | Game Rule | Default | Description |
 |-----------|---------|-------------|
@@ -42,6 +54,26 @@ Player-crafted **beehives** retain vanilla behavior. Smoke still fully protects 
 | `selfcarehive.wildbees.nest_anger_max` | 2400 | Maximum anger duration (ticks) |
 | `selfcarehive.wildbees.min_sting_health` | 4.0 | Minimum HP for wild bees after stinging (prevents death) |
 | `selfcarehive.wildbees.non_lethal_stings` | true | Prevent wild bees from dying when stinging |
+
+---
+
+## Bee Dimensions
+
+Bees are now smaller and hives hold more of them.
+
+### Size & Capacity
+
+- **Bees are 65% of vanilla size** — more realistic proportions
+- **Hives hold 21 bees** instead of vanilla's 3 — allows for proper colonies
+- **Suffocation prevention** — small bees won't get stuck and die in blocks
+
+### Bee Dimensions Configuration (Game Rules)
+
+| Game Rule | Default | Description |
+|-----------|---------|-------------|
+| `selfcarehive.beedimensions.modifier` | 0.65 | Bee size multiplier (0.65 = 65% of vanilla) |
+| `selfcarehive.beedimensions.hive_capacity` | 21 | Maximum bees per hive (vanilla = 3) |
+| `selfcarehive.beedimensions.prevent_suffocation` | true | Prevent small bees from suffocation damage |
 
 ---
 
@@ -63,7 +95,7 @@ Babies are created when a bee exits the nest. Only a single adult bee is require
 
 By default, 5 honey levels are required for each offspring.
 
-### Configuration (Game Rules)
+### Self-Care Configuration (Game Rules)
 
 | Game Rule | Default | Description |
 |-----------|---------|-------------|
@@ -79,7 +111,6 @@ By default, 5 honey levels are required for each offspring.
 ## Installation
 
 - **Platform:** Fabric
-- **Minecraft:** 1.21.9+
 - **Requirements:** Fabric API, Java 21+
 
 ---
