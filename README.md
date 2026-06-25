@@ -10,11 +10,14 @@
 
 | Minecraft | Branch | Status |
 |-----------|--------|--------|
-| 1.21.9–1.21.10 | `1.21.10` | ✅ Active Development |
-| 1.21.6–1.21.8 | `1.21.8` | ✅ Supported |
-| 1.21.2–1.21.5 | `1.21.5` | ✅ Supported |
+| 1.21.4–1.21.11 | `1.21.11` | ✅ Active development |
+| 1.21–1.21.1 | `1.21` | 🔜 Planned |
 
-All versions include the full feature set: wild bee mechanics, bee dimensions, healing, and breeding.
+**Future:** **26.x** (new-gen builds, Mojmap) — not started.
+
+All supported lines include the full feature set: wild bee mechanics, bee dimensions, healing, and breeding.
+
+**Not supported:** 1.21.2–1.21.3 (gap between release lines). Pre-1.21 — use [upstream Self-Care Hive](https://modrinth.com/mod/selfcare-hive).
 
 ---
 

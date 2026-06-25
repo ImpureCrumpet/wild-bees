@@ -28,6 +28,7 @@ import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BeehiveBlockEntity.BeeData;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.Angerable;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
@@ -37,6 +38,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import tk.estecka.selfcarehive.BeehiveUtil;
 import tk.estecka.selfcarehive.IBeeColonyTracker;
+import tk.estecka.selfcarehive.IBeeFromNest;
 import tk.estecka.selfcarehive.SelfCareHive;
 
 import static net.minecraft.block.entity.BeehiveBlockEntity.MAX_BEE_COUNT;
@@ -71,9 +73,12 @@ implements IBeeColonyTracker
 /* # Colony Tracker                                                           */
 /******************************************************************************/
 
+	private ServerWorld selfcarehive$serverWorld() {
+		return (ServerWorld) this.getWorld();
+	}
+
 	private void GarbageCollectBees() {
-		// Updates absence times, and removes bees that are deemed missing.
-		final int maxAbsence = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.TRACKING_DURATION);
+		final int maxAbsence = selfcarehive$serverWorld().getGameRules().getValue(SelfCareHive.TRACKING_DURATION);
 		var iterator = knownBees.entrySet().iterator();
 		while (iterator.hasNext()) {
 			var entry = iterator.next();
@@ -90,7 +95,7 @@ implements IBeeColonyTracker
 		this.elapsedTicks = 0;
 
 		// Removes bees that were pushed out by new inhabitants.
-		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		int maxCapacity = selfcarehive$serverWorld().getGameRules().getValue(SelfCareHive.BEEHIVE_CAPACITY);
 		final int maxKnownBees = Math.max(0, maxCapacity - this.getBeeCount());
 		if (knownBees.size() > maxKnownBees) {
 			// Sorts from newest (smallest) to oldest (largest)
@@ -120,7 +125,7 @@ implements IBeeColonyTracker
 
 	public boolean selfcarehive$isColonyFull(){
 		this.GarbageCollectBees();
-		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		int maxCapacity = selfcarehive$serverWorld().getGameRules().getValue(SelfCareHive.BEEHIVE_CAPACITY);
 		return (this.getBeeCount() + this.knownBees.size()) >= maxCapacity;
 	}
 
@@ -149,15 +154,15 @@ implements IBeeColonyTracker
 	/* # Bee Dimensions Integration                                               */
 	/******************************************************************************/
 
-	@Inject(method = "isFull()Z", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "isFullOfBees()Z", at = @At("HEAD"), cancellable = true)
 	private void modifyIsFull(CallbackInfoReturnable<Boolean> cir) {
-		int maxCapacity = this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		int maxCapacity = selfcarehive$serverWorld().getGameRules().getValue(SelfCareHive.BEEHIVE_CAPACITY);
 		cir.setReturnValue(this.getBeeCount() >= maxCapacity);
 	}
 
-	@ModifyConstant(method = "addOccupant", constant = @Constant(intValue = 3))
+	@ModifyConstant(method = "tryEnterHive", constant = @Constant(intValue = 3))
 	private int modifyMaxBeeCount(int original) {
-		return this.getWorld().getServer().getGameRules().getInt(SelfCareHive.BEEHIVE_CAPACITY);
+		return selfcarehive$serverWorld().getGameRules().getValue(SelfCareHive.BEEHIVE_CAPACITY);
 	}
 
 
@@ -206,13 +211,12 @@ implements IBeeColonyTracker
 			// Check if this is a bee nest release (for extended anger duration)
 			boolean isNest = tk.estecka.selfcarehive.WildBeeUtil.isBeeNest(hiveState);
 			if (isNest && world instanceof ServerWorld serverWorld) {
-				net.minecraft.world.GameRules rules = serverWorld.getServer().getGameRules();
-				net.minecraft.util.math.random.Random random = serverWorld.getRandom();
-				int angerMin = rules.getInt(SelfCareHive.NEST_ANGER_MIN);
-				int angerMax = rules.getInt(SelfCareHive.NEST_ANGER_MAX);
-				int angerTime = angerMin + random.nextInt(angerMax - angerMin + 1);
-				bee.setAngerTime(angerTime);
-				((tk.estecka.selfcarehive.mixin.BeeEntityMixin)(Object)bee).selfcarehive$markFromNest();
+				var rules = serverWorld.getGameRules();
+				int angerMin = rules.getValue(SelfCareHive.NEST_ANGER_MIN);
+				int angerMax = rules.getValue(SelfCareHive.NEST_ANGER_MAX);
+				long angerDuration = angerMin + serverWorld.getRandom().nextInt(angerMax - angerMin + 1);
+				((Angerable) bee).setAngerDuration(angerDuration);
+				((IBeeFromNest) bee).selfcarehive$markFromNest();
 			}
 
 			var result = BeehiveUtil.TryCreateBaby(bee, colony, (ServerWorld)world, hiveState, pos);
@@ -235,7 +239,9 @@ implements IBeeColonyTracker
 		BeeEntity babyEntity = baby.get();
 		if (babyEntity != null){
 			babyEntity.refreshPositionAndAngles(x, y, z, yaw, pitch);
-			bee.getWorld().spawnEntity(babyEntity);
+			if (bee.getEntityWorld() instanceof ServerWorld serverWorld) {
+				serverWorld.spawnEntity(babyEntity);
+			}
 		}
 
 		original.call(bee, x, y, z, yaw, pitch);

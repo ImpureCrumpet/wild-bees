@@ -25,6 +25,15 @@ bin/
 .factorypath
 .project
 
+# cursor
+
+.cursor/
+.cursorrules
+
+# reference docs (local only)
+
+ref/
+
 # macos
 
 *.DS_Store
@@ -41,7 +50,3 @@ replay_*.log
 *.jfr
 
 *.bak
-
-ref/
-
-.cursor/*

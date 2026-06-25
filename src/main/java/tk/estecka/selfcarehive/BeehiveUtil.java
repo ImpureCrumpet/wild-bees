@@ -7,8 +7,8 @@ import net.minecraft.block.entity.BeehiveBlockEntity;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraft.world.rule.GameRules;
 
 public class BeehiveUtil
 {
@@ -18,11 +18,15 @@ public class BeehiveUtil
 		return hiveState;
 	}
 
+	static private GameRules rulesOf(World world) {
+		return ((ServerWorld) world).getGameRules();
+	}
+
 	static public BlockState TryHeal(BeeEntity bee, World world, BlockState hiveState, BlockPos hivePos){
-		GameRules rules = world.getServer().getGameRules();
-		boolean canHeal = rules.getBoolean(SelfCareHive.CAN_HEAL);
-		int cost = rules.getInt(SelfCareHive.HEALING_COST);
-		float potency = (float)rules.get(SelfCareHive.HEALING_AMOUNT).get();
+		GameRules rules = rulesOf(world);
+		boolean canHeal = rules.getValue(SelfCareHive.CAN_HEAL);
+		int cost = rules.getValue(SelfCareHive.HEALING_COST);
+		float potency = rules.getValue(SelfCareHive.HEALING_AMOUNT).floatValue();
 		
 		int honey = BeehiveBlockEntity.getHoneyLevel(hiveState);
 		boolean isHurt = bee.getHealth() < bee.getMaxHealth();
@@ -38,21 +42,20 @@ public class BeehiveUtil
 	}
 
 	static public Pair<@Nullable BeeEntity, BlockState>	TryCreateBaby(BeeEntity parent, IBeeColonyTracker colony, ServerWorld world, BlockState hiveState, BlockPos hivePos){
-		GameRules rules = world.getServer().getGameRules();
-		boolean canBreed = rules.getBoolean(SelfCareHive.CAN_BREED);
-		int cost = rules.getInt(SelfCareHive.BREEDING_COST);
+		GameRules rules = world.getGameRules();
+		boolean canBreed = rules.getValue(SelfCareHive.CAN_BREED);
+		int cost = rules.getValue(SelfCareHive.BREEDING_COST);
 
 		int honey = BeehiveBlockEntity.getHoneyLevel(hiveState);
 		
-		// colony.selfcarehive$LogColony();
 		if (canBreed
 		&&  honey >= cost
-		&&  parent.getBreedingAge() == 0 // Checks both adulthood and breeding cooldown.
+		&&  parent.getBreedingAge() == 0
 		&&  !colony.selfcarehive$isColonyFull()
 		){
 			BeeEntity baby = parent.createChild(world, parent);
 			baby.setBaby(true);
-			baby.setPosition(parent.getPos());
+			baby.setPosition(parent.getEntityPos());
 			parent.resetLoveTicks();
 			parent.setBreedingAge(6000);
 			hiveState = SetHoneyLevel(honey-cost, world, hiveState, hivePos);

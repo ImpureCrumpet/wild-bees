@@ -1,53 +1,70 @@
 package tk.estecka.selfcarehive;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gamerule.v1.CustomGameRuleCategory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
-import net.fabricmc.fabric.api.gamerule.v1.rule.DoubleRule;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules.BooleanRule;
-import net.minecraft.world.GameRules.IntRule;
-import net.minecraft.world.GameRules.Key;
+import net.minecraft.world.rule.GameRule;
+import net.minecraft.world.rule.GameRuleCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory.createIntRule;
-import static net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory.createBooleanRule;
-import static net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory.createDoubleRule;
 
 public class SelfCareHive
 implements ModInitializer
 {
 	static public final Logger LOGGER = LoggerFactory.getLogger("selfcare-hive");
 
-	static public final CustomGameRuleCategory CATEGORY = new CustomGameRuleCategory(
-		Identifier.of("selfcare-hive", "gamerules"),
-		Text.translatable("selfcarehive.gamerules").formatted(Formatting.BOLD, Formatting.YELLOW)
+	static public final GameRuleCategory CATEGORY = GameRuleCategory.register(
+		Identifier.of("selfcarehive", "gamerules")
 	);
-	
-	static public final Key<BooleanRule> CAN_HEAL      = GameRuleRegistry.register("selfcarehive.healing",         CATEGORY, createBooleanRule(true));
-	static public final Key<IntRule> HEALING_COST      = GameRuleRegistry.register("selfcarehive.healing.cost",    CATEGORY, createIntRule(1, 0));
-	static public final Key<DoubleRule> HEALING_AMOUNT = GameRuleRegistry.register("selfcarehive.healing.potency", CATEGORY, createDoubleRule(2.0, 0.0));
 
-	static public final Key<BooleanRule> CAN_BREED     = GameRuleRegistry.register("selfcarehive.breeding",          CATEGORY, createBooleanRule(true));
-	static public final Key<IntRule> BREEDING_COST     = GameRuleRegistry.register("selfcarehive.breeding.cost",     CATEGORY, createIntRule(5, 0));
-	static public final Key<IntRule> TRACKING_DURATION = GameRuleRegistry.register("selfcarehive.tracking.duration", CATEGORY, createIntRule(12_000, 0));
+	static public final GameRule<Boolean> CAN_HEAL = GameRuleBuilder
+		.forBoolean(true).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "healing"));
+	static public final GameRule<Integer> HEALING_COST = GameRuleBuilder
+		.forInteger(1).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "healing.cost"));
+	static public final GameRule<Double> HEALING_AMOUNT = GameRuleBuilder
+		.forDouble(2.0).range(0.0, Double.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "healing.potency"));
 
-	// Wild Bee Mechanics
-	static public final Key<IntRule> ESCALATION_RADIUS  = GameRuleRegistry.register("selfcarehive.wildbees.escalation_radius", CATEGORY, createIntRule(8, 0));
-	static public final Key<IntRule> NEST_ANGER_MIN     = GameRuleRegistry.register("selfcarehive.wildbees.nest_anger_min", CATEGORY, createIntRule(1200, 0));
-	static public final Key<IntRule> NEST_ANGER_MAX     = GameRuleRegistry.register("selfcarehive.wildbees.nest_anger_max", CATEGORY, createIntRule(2400, 0));
-	static public final Key<DoubleRule> MIN_STING_HEALTH = GameRuleRegistry.register("selfcarehive.wildbees.min_sting_health", CATEGORY, createDoubleRule(4.0, 0.0)); // Minimum health for wild bees after stinging (prevents death)
-	static public final Key<BooleanRule> NON_LETHAL_STINGS = GameRuleRegistry.register("selfcarehive.wildbees.non_lethal_stings", CATEGORY, createBooleanRule(true)); // Prevents wild bees from dying when stinging
+	static public final GameRule<Boolean> CAN_BREED = GameRuleBuilder
+		.forBoolean(true).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "breeding"));
+	static public final GameRule<Integer> BREEDING_COST = GameRuleBuilder
+		.forInteger(5).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "breeding.cost"));
+	static public final GameRule<Integer> TRACKING_DURATION = GameRuleBuilder
+		.forInteger(12_000).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "tracking.duration"));
 
-	// Bee Dimensions Mechanics (hardcoded defaults for client/server consistency)
-	static public final float BEE_SIZE_DEFAULT = 0.65f; // Hardcoded for client-side rendering
-	static public final int BEEHIVE_CAPACITY_DEFAULT = 21; // Hardcoded for client-side rendering
-	
-	static public final Key<DoubleRule> BEE_SIZE_MODIFIER = GameRuleRegistry.register("selfcarehive.beedimensions.modifier", CATEGORY, createDoubleRule(0.65, 0.01, 5.0)); // Bee size multiplier (0.65 = 65% of vanilla)
-	static public final Key<IntRule> BEEHIVE_CAPACITY = GameRuleRegistry.register("selfcarehive.beedimensions.hive_capacity", CATEGORY, createIntRule(21, 1, 50)); // Maximum bees per hive (vanilla = 3)
-	static public final Key<BooleanRule> PREVENT_SUFFOCATION = GameRuleRegistry.register("selfcarehive.beedimensions.prevent_suffocation", CATEGORY, createBooleanRule(true)); // Prevent small bees from suffocation damage (fixes disappearing bug)
+	static public final GameRule<Integer> ESCALATION_RADIUS = GameRuleBuilder
+		.forInteger(8).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "wildbees.escalation_radius"));
+	static public final GameRule<Integer> NEST_ANGER_MIN = GameRuleBuilder
+		.forInteger(1200).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "wildbees.nest_anger_min"));
+	static public final GameRule<Integer> NEST_ANGER_MAX = GameRuleBuilder
+		.forInteger(2400).range(0, Integer.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "wildbees.nest_anger_max"));
+	static public final GameRule<Double> MIN_STING_HEALTH = GameRuleBuilder
+		.forDouble(4.0).range(0.0, Double.MAX_VALUE).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "wildbees.min_sting_health"));
+	static public final GameRule<Boolean> NON_LETHAL_STINGS = GameRuleBuilder
+		.forBoolean(true).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "wildbees.non_lethal_stings"));
+
+	static public final float BEE_SIZE_DEFAULT = 0.65f;
+	static public final int BEEHIVE_CAPACITY_DEFAULT = 21;
+
+	static public final GameRule<Double> BEE_SIZE_MODIFIER = GameRuleBuilder
+		.forDouble(0.65).range(0.01, 5.0).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "beedimensions.modifier"));
+	static public final GameRule<Integer> BEEHIVE_CAPACITY = GameRuleBuilder
+		.forInteger(21).range(1, 50).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "beedimensions.hive_capacity"));
+	static public final GameRule<Boolean> PREVENT_SUFFOCATION = GameRuleBuilder
+		.forBoolean(true).category(CATEGORY)
+		.buildAndRegister(Identifier.of("selfcarehive", "beedimensions.prevent_suffocation"));
 
 	@Override
 	public void onInitialize() {

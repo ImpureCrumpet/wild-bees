@@ -24,8 +24,8 @@
 		"selfcare-hive.mixins.json"
 	],
 	"depends": {
-		"minecraft": "~1.21.9",
-		"fabricloader": ">=0.16.13",
+		"minecraft": ">=1.21.4 <1.22-",
+		"fabricloader": ">=0.18.6",
 		"fabric-api": "*",
 		"java": ">=21"
 	}
