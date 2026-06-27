@@ -7,12 +7,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import tk.estecka.selfcarehive.SelfCareHive;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class BeeModelScaleMixin {
 	@Inject(method = "scale", at = @At("TAIL"))
-	private void applyBeeScale(LivingEntityRenderState state, MatrixStack matrices) {
+	private void applyBeeScale(LivingEntityRenderState state, MatrixStack matrices, CallbackInfo ci) {
 		if ((Object) this instanceof BeeEntityRenderer) {
 			float scale = SelfCareHive.BEE_SIZE_DEFAULT;
 			matrices.scale(scale, scale, scale);
